@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CR7 - 3D Interactive Tribute</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700&display=swap');
+        
+        :root {
+            --cr-red: #dc052d;
+            --cr-red-dark: #a00320;
+            --cr-gold: #d4af37;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Bebas Neue', sans-serif;
+            color: white;
+            background: #000;
+            overflow-x: hidden;
+            perspective: 1000px;
+        }
+        
+        /* Scroll Snap */
+        .scroll-container {
+            scroll-snap-type: y mandatory;
+            height: 100vh;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+        
+        section {
+            height: 100vh;
+            scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 3D Floating CR7 Text */
+        .cr7-3d {
+            position: absolute;
+            font-size: 15rem;
+            font-weight: bold;
+            color: var(--cr-red);
+            text-shadow: 
+                5px 5px 0px var(--cr-red-dark),
+                10px 10px 20px rgba(0, 0, 0, 0.5);
+            transform-style: preserve-3d;
+            animation: float3d 6s infinite alternate ease-in-out;
+            opacity: 0.8;
+            z-index: 1;
+        }
+        
+        @keyframes float3d {
+            0% { transform: translateZ(0) rotateX(0) rotateY(0); }
+            100% { transform: translateZ(100px) rotateX(10deg) rotateY(10deg); }
+        }
+        
+        /* 3D Rotating Ball */
+        .football-3d {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle at 30% 30%, white, #777);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 30px rgba(220, 5, 45, 0.7),
+                inset -10px -10px 20px rgba(0, 0, 0, 0.5);
+            transform-style: preserve-3d;
+            animation: spin3d 8s infinite linear;
+            z-index: 2;
+        }
+        
+        .football-3d::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 50% 50%, transparent 60%, black 60.5%),
+                linear-gradient(90deg, black 48%, transparent 48%, transparent 52%, black 52%),
+                linear-gradient(0deg, black 48%, transparent 48%, transparent 52%, black 52%);
+            border-radius: 50%;
+        }
+        
+        @keyframes spin3d {
+            0% { transform: rotateY(0) rotateX(0); }
+            100% { transform: rotateY(360deg) rotateX(360deg); }
+        }
+        
+        /* 3D Card Flip */
+        .card-3d {
+            width: 300px;
+            height: 400px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s;
+            cursor: pointer;
+        }
+        
+        .card-3d:hover {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 30px var(--cr-red);
+        }
+        
+        .card-front {
+            background: linear-gradient(45deg, var(--cr-red), var(--cr-red-dark));
+            transform: rotateY(0deg);
+        }
+        
+        .card-back {
+            background: linear-gradient(45deg, black, #333);
+            transform: rotateY(180deg);
+            padding: 20px;
+            text-align: center;
+        }
+        
+        /* Red Scroll Animations */
+        .scroll-animate {
+            opacity: 0;
+            transition: all 1s ease-out;
+        }
+        
+        .scroll-animate.fade-in {
+            opacity: 1;
+            transform: translateY(0) !important;
+        }
+        
+        /* Stats Grid with 3D Tilt */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 50px;
+            transform-style: preserve-3d;
+        }
+        
+        .stat-box {
+            background: rgba(0, 0, 0, 0.7);
+            border: 3px solid var(--cr-red);
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s;
+            transform-style: preserve-3d;
+        }
+        
+        .stat-box:hover {
+            transform: translateZ(20px) rotateX(5deg);
+            box-shadow: 0 0 30px var(--cr-red);
+        }
+        
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .mouse {
+            width: 25px;
+            height: 40px;
+            border: 2px solid var(--cr-red);
+            border-radius: 15px;
+            margin-bottom: 5px;
+            position: relative;
+        }
+        
+        .mouse::before {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 8px;
+            background: var(--cr-red);
+            border-radius: 2px;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: scroll 2s infinite;
+        }
+        
+        @keyframes scroll {
+            0% { transform: translate(-50%, 0); opacity: 1; }
+            100% { transform: translate(-50%, 10px); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="scroll-container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="cr7-3d" style="top: 20%; left: 10%;">CR7</div>
+            <div class="cr7-3d" style="top: 60%; left: 70%;">GOAT</div>
+            <div class="football-3d" style="top: 40%; left: 50%;"></div>
+            <h1 style="
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 8rem;
+                text-align: center;
+                opacity: 0;
+                transition: all 1s ease-out;
+            ">Cristiano Ronaldo</h1>
+        </section>
+        
+        <!-- 3D Card Flip Section -->
+        <section class="card-section">
+            <div class="card-3d" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                <div class="card-front">
+                    <h2 style="font-size: 3rem;">CR7</h2>
+                </div>
+                <div class="card-back">
+                    <p>"Your love makes me strong, your hate makes me unstoppable."</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Stats Section -->
+        <section class="stats">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h2>850+</h2>
+                    <p>Career Goals</p>
+                </div>
+                <div class="stat-box">
+                    <h2>5</h2>
+                    <p>Ballon d'Or</p>
+                </div>
+                <div class="stat-box">
+                    <h2>34</h2>
+                    <p>Trophies</p>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <div class="scroll-indicator">
+        <div class="mouse"></div>
+        <div style="color: var(--cr-red);">SCROLL</div>
+    </div>
+    
+    <script>
+        // 3D Scroll Animations
+        document.querySelectorAll('.scroll-animate').forEach(el => {
+            el.style.transform = 'translateY(50px)';
+        });
+        
+        // Intersection Observer for scroll effects
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, { threshold: 0.3 });
+        
+        document.querySelectorAll('.scroll-animate').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Mouse Move Parallax Effect
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            document.querySelectorAll('.cr7-3d').forEach(el => {
+                el.style.transform = `translateZ(${y * 100}px) rotateX(${y * 20}deg) rotateY(${x * 20}deg)`;
+            });
+            
+            document.querySelector('.football-3d').style.transform = 
+                `rotateX(${y * 360}deg) rotateY(${x * 360}deg) translateZ(50px)`;
+        });
+    </script>
+</body>
+</html>
